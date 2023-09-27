@@ -219,7 +219,7 @@ export default class WindowsIntegrationManager implements IntegrationManager {
     // just get WSL to do the transformation for us.
 
     const logStream = Logging[`wsl-helper.${ distro }`];
-    try {
+    // try {
       const { stdout } = await spawnFile(
         await this.wslExe,
         ['--distribution', distro, '--exec', '/bin/wslpath', '-a', '-u',
@@ -227,10 +227,10 @@ export default class WindowsIntegrationManager implements IntegrationManager {
         { stdio: ['ignore', 'pipe', logStream] },
       );
       return stdout.trim();
-    } catch (err) {
-      console.log(`getLinuxToolPath() ERROR: ${ err }`);
-    }
-    return "___hard coded error string___";
+    // } catch (err) {
+    //   console.log(`__getLinuxToolPath() ERROR: ${ err }`);
+    // }
+    // return "___getLinuxToolPath error return___";
   }
 
   protected async syncSocketProxy(): Promise<void> {
@@ -274,6 +274,8 @@ export default class WindowsIntegrationManager implements IntegrationManager {
       const executable = await this.getLinuxToolPath(distro, 'wsl-helper');
       const logStream = Logging[`wsl-helper.${ distro }`];
 
+      console.log(`__syncDistroSocketProxy() executable = ${ executable }`);
+      console.log(`__syncDistroSocketProxy() getLinuxToolPath(${ distro }) did not fail`);
       this.distroSocketProxyProcesses[distro] ??= new BackgroundProcess(
         `${ distro } socket proxy`,
         {
