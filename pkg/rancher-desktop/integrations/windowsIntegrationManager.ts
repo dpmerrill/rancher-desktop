@@ -229,9 +229,8 @@ export default class WindowsIntegrationManager implements IntegrationManager {
       return stdout.trim();
     } catch (err) {
       console.log(`__getLinuxToolPath() ERROR: ${ err }`);
-      throw( `__getLinuxToolPath() throw error`);
+      throw new Error(`__getLinuxToolPath() throw error`);
     }
-    // return "___getLinuxToolPath error return___";
   }
 
   protected async syncSocketProxy(): Promise<void> {
