@@ -219,14 +219,18 @@ export default class WindowsIntegrationManager implements IntegrationManager {
     // just get WSL to do the transformation for us.
 
     const logStream = Logging[`wsl-helper.${ distro }`];
-    const { stdout } = await spawnFile(
-      await this.wslExe,
-      ['--distribution', distro, '--exec', '/bin/wslpath', '-a', '-u',
-        path.join(paths.resources, 'linux', ...tool)],
-      { stdio: ['ignore', 'pipe', logStream] },
-    );
-
-    return stdout.trim();
+    try {
+      const { stdout } = await spawnFile(
+        await this.wslExe,
+        ['--distribution', distro, '--exec', '/bin/wslpath', '-a', '-u',
+          path.join(paths.resources, 'linux', ...tool)],
+        { stdio: ['ignore', 'pipe', logStream] },
+      );
+      return stdout.trim();
+    } catch (err) {
+      console.log(`getLinuxToolPath() ERROR: ${ err }`);
+    }
+    return "___hard coded error string___";
   }
 
   protected async syncSocketProxy(): Promise<void> {
@@ -249,7 +253,11 @@ export default class WindowsIntegrationManager implements IntegrationManager {
 
     await Promise.all(
       (await this.supportedDistros).map((distro) => {
-        return this.syncDistroSocketProxy(distro.name, !reason);
+        try {
+          return this.syncDistroSocketProxy(distro.name, !reason);
+        } catch (err) {
+          console.log(`___syncDistroSocketProxy(${ distro.name }) ERROR: ${ err }`);
+        }
       }),
     );
   }
