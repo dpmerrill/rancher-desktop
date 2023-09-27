@@ -313,9 +313,13 @@ export default class WindowsIntegrationManager implements IntegrationManager {
     const promises: Promise<void>[] = hostPluginNames.map(hostPluginName => this.syncHostDockerPlugin(hostPluginName) );
 
     for (const wslPluginName of wslPluginNames) {
-      promises.push(
-        ...(await this.supportedDistros).map(distro => this.syncDistroDockerPlugin(distro.name, wslPluginName )),
-      );
+      try {
+        promises.push(
+          ...(await this.supportedDistros).map(distro => this.syncDistroDockerPlugin(distro.name, wslPluginName )),
+        );
+      } catch (err) {
+        console.log(`__syncDockerPlugins() ERROR: ${ err }`);
+      }
     }
     await Promise.all(promises);
   }
