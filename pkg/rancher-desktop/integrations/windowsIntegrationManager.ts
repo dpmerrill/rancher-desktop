@@ -229,7 +229,7 @@ export default class WindowsIntegrationManager implements IntegrationManager {
       return stdout.trim();
     } catch (err) {
       console.log(`__getLinuxToolPath() ERROR: ${ err }`);
-      throw new Error(`__getLinuxToolPath() throw error`);
+      throw new Error(`__temp getLinuxToolPath() throw error__`);
     }
   }
 
@@ -316,7 +316,6 @@ export default class WindowsIntegrationManager implements IntegrationManager {
         promises.push(
           ...(await this.supportedDistros).map(distro => this.syncDistroDockerPlugin(distro.name, wslPluginName) )
         );
-        (await this.supportedDistros).map(x => { console.log(`__test(${ x })`); })
     }
     await Promise.all(promises);
   }
