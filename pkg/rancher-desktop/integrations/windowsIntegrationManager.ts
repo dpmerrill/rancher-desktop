@@ -219,18 +219,13 @@ export default class WindowsIntegrationManager implements IntegrationManager {
     // just get WSL to do the transformation for us.
 
     const logStream = Logging[`wsl-helper.${ distro }`];
-    try {
-      const { stdout } = await spawnFile(
-        await this.wslExe,
-        ['--distribution', distro, '--exec', '/bin/wslpath', '-a', '-u',
-          path.join(paths.resources, 'linux', ...tool)],
-        { stdio: ['ignore', 'pipe', logStream] },
-      );
-      return stdout.trim();
-    } catch (err) {
-      console.error(`getLinuxToolPath ${ err }`);
-      throw err;
-    }
+    const { stdout } = await spawnFile(
+      await this.wslExe,
+      ['--distribution', distro, '--exec', '/bin/wslpath', '-a', '-u',
+        path.join(paths.resources, 'linux', ...tool)],
+      { stdio: ['ignore', 'pipe', logStream] },
+    );
+    return stdout.trim();
   }
 
   protected async syncSocketProxy(): Promise<void> {
