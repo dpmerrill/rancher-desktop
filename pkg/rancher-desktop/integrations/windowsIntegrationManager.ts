@@ -228,7 +228,7 @@ export default class WindowsIntegrationManager implements IntegrationManager {
       );
       return stdout.trim();
     } catch (err) {
-      console.error(`getLinuxToolPath Error: ${ err }`);
+      console.error(`getLinuxToolPath ${ err }`);
       throw new Error(`_${ err }_`);
     }
   }
@@ -511,9 +511,9 @@ export default class WindowsIntegrationManager implements IntegrationManager {
         return `Error: ${ stdout.trim() }`;
       }
     } catch (error) {
-      console.log(`WSL distro "${ distro.name }" error: ${ error }`);
+      console.log(`WSL distro "${ distro.name }" ${ error }`);
       if ((typeof error === 'object' && error) || typeof error === 'string') {
-        return `Error: ${ error }`;
+        return `${ error }`;
       } else {
         return `Error: unexpected error getting state of distro`;
       }
