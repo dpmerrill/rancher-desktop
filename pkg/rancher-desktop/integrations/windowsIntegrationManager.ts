@@ -227,9 +227,9 @@ export default class WindowsIntegrationManager implements IntegrationManager {
         { stdio: ['ignore', 'pipe', logStream] },
       );
       return stdout.trim();
-    } catch (error) {
-      console.error(`getLinuxToolPath Error: ${ error }`);
-      throw new Error(`${ error }`);
+    } catch (err) {
+      console.error(`getLinuxToolPath Error: ${ err }`);
+      throw new Error(`_${ err }_`);
     }
   }
 
