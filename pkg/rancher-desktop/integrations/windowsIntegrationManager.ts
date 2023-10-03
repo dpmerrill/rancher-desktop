@@ -229,7 +229,8 @@ export default class WindowsIntegrationManager implements IntegrationManager {
       return stdout.trim();
     } catch (err) {
       console.error(`getLinuxToolPath ${ err }`);
-      throw new Error(`_${ err }_`);
+      throw err;
+      // throw new Error(`_${ err }_`);
     }
   }
 
