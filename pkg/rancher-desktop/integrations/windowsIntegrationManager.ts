@@ -315,11 +315,11 @@ export default class WindowsIntegrationManager implements IntegrationManager {
     for (const wslPluginName of wslPluginNames) {
       promises.push(
         ...(await this.supportedDistros).map(async distro => {
-          try {
+//          try {
             await this.syncDistroDockerPlugin(distro.name, wslPluginName);
-          } catch (err) {
-            console.error(err);
-          }
+//          } catch (err) {
+//            console.error(err);
+//          }
         })
       );
     }
@@ -369,29 +369,33 @@ export default class WindowsIntegrationManager implements IntegrationManager {
   }
 
   protected async syncDistroDockerPlugin(distro: string, pluginName: string) {
-    const srcPath = await this.getLinuxToolPath(distro, 'bin', pluginName);
-    const destDir = '$HOME/.docker/cli-plugins';
-    const destPath = `${ destDir }/${ pluginName }`;
-    const state = this.settings.WSL?.integrations?.[distro] === true;
+    try {
+      const srcPath = await this.getLinuxToolPath(distro, 'bin', pluginName);
+      const destDir = '$HOME/.docker/cli-plugins';
+      const destPath = `${ destDir }/${ pluginName }`;
+      const state = this.settings.WSL?.integrations?.[distro] === true;
 
-    console.debug(`Syncing ${ distro } ${ pluginName }: ${ srcPath } -> ${ destDir }`);
-    if (state) {
-      await this.execCommand({ distro }, '/bin/sh', '-c', `mkdir -p "${ destDir }"`);
-      await this.execCommand({ distro }, '/bin/sh', '-c', `if [ ! -e "${ destPath }" -a ! -L "${ destPath }" ] ; then ln -s "${ srcPath }" "${ destPath }" ; fi`);
-    } else {
-      try {
-        // This is preferred to doing the readlink and rm in one long /bin/sh
-        // statement because then we rely on the distro's readlink supporting
-        // the -n option. Gnu/linux readlink supports -f, On macOS the -f means
-        // something else (not that we're likely to see macos WSLs).
-        const targetPath = (await this.captureCommand({ distro }, '/bin/sh', '-c', `readlink -f "${ destPath }"`)).trimEnd();
+      console.debug(`Syncing ${ distro } ${ pluginName }: ${ srcPath } -> ${ destDir }`);
+      if (state) {
+        await this.execCommand({ distro }, '/bin/sh', '-c', `mkdir -p "${ destDir }"`);
+        await this.execCommand({ distro }, '/bin/sh', '-c', `if [ ! -e "${ destPath }" -a ! -L "${ destPath }" ] ; then ln -s "${ srcPath }" "${ destPath }" ; fi`);
+      } else {
+        try {
+          // This is preferred to doing the readlink and rm in one long /bin/sh
+          // statement because then we rely on the distro's readlink supporting
+          // the -n option. Gnu/linux readlink supports -f, On macOS the -f means
+          // something else (not that we're likely to see macos WSLs).
+          const targetPath = (await this.captureCommand({ distro }, '/bin/sh', '-c', `readlink -f "${ destPath }"`)).trimEnd();
 
-        if (targetPath === srcPath) {
-          await this.execCommand({ distro }, '/bin/sh', '-c', `rm "${ destPath }"`);
+          if (targetPath === srcPath) {
+            await this.execCommand({ distro }, '/bin/sh', '-c', `rm "${ destPath }"`);
+          }
+        } catch (err) {
+          console.log(`Failed to readlink/rm ${ destPath }`, err);
         }
-      } catch (err) {
-        console.log(`Failed to readlink/rm ${ destPath }`, err);
       }
+    } catch (err) {
+      console.error(`Failed to sync docker plugin: ${ err }`);
     }
   }
 
